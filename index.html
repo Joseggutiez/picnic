@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nahir · una invitación 🌷</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#203f76;--green:#3f7457;--pink:#e7a0aa;--paper:#fffaf0;--cream:#f7f0df}
+html,body{margin:0;min-height:100%;font-family:Georgia,'Times New Roman',serif;color:var(--ink);overflow:hidden}
+body{background:#f5efe2}
+button{font:inherit}
+
+/* Hand-drawn background */
+.background{position:fixed;inset:0;overflow:hidden;background:
+ radial-gradient(circle at 15% 18%,rgba(255,255,255,.9),transparent 28%),
+ radial-gradient(circle at 85% 80%,rgba(244,207,211,.38),transparent 30%),
+ #f8f1e4}
+.background:before{content:"";position:absolute;inset:0;opacity:.28;background-image:url("data:image/svg+xml,%3Csvg width='180' height='180' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23203f76' stroke-width='1.3' opacity='.25'%3E%3Cpath d='M15 145c25-35 25-70 3-108M22 116c12-5 20-14 24-27M18 92c-8-7-12-15-12-25M160 160c-18-29-17-61 4-99M154 115c-11-6-17-14-20-24M160 91c7-7 10-15 9-23'/%3E%3C/g%3E%3C/svg%3E")}
+
+.scene{position:relative;z-index:3;min-height:100vh;display:grid;place-items:center;padding:20px}
+.intro{position:absolute;top:7%;text-align:center;letter-spacing:3px;text-transform:uppercase;font-size:11px;color:#6c6a64}
+.intro b{font-weight:normal;color:var(--ink)}
+
+/* Floating hearts / future photo bubbles */
+.hearts{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.heart{position:absolute;bottom:-90px;font-size:22px;opacity:.65;animation:rise linear infinite}
+.heart.photo{width:52px;height:52px;border-radius:50%;padding:4px;background:rgba(255,250,240,.82);border:1px solid rgba(32,63,118,.22);box-shadow:0 5px 15px rgba(40,50,70,.08);font-size:0;display:grid;place-items:center}
+.heart.photo:after{content:'♡';font-size:28px;color:var(--pink)}
+@keyframes rise{0%{transform:translateY(0) rotate(0deg);opacity:0}10%{opacity:.65}100%{transform:translateY(-118vh) rotate(20deg);opacity:0}}
+
+/* Envelope */
+.envelope-stage{width:min(90vw,450px);height:350px;position:relative;touch-action:none;user-select:none}
+.envelope{position:absolute;left:0;right:0;bottom:15px;height:275px;cursor:grab;filter:drop-shadow(0 22px 25px rgba(49,57,70,.16));transition:transform .25s ease}
+.envelope:active{cursor:grabbing}
+.env-back{position:absolute;inset:0;background:#f2dfcf;border-radius:12px;border:1px solid rgba(32,63,118,.1)}
+.env-front{position:absolute;inset:0;background:#f8e9db;border-radius:12px;overflow:hidden}
+.env-front:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,transparent 49.5%,rgba(32,63,118,.12) 50%,transparent 50.5%),linear-gradient(35deg,transparent 49.5%,rgba(32,63,118,.12) 50%,transparent 50.5%)}
+.flap{position:absolute;z-index:12;left:0;top:0;width:100%;height:66%;background:#ead2c4;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top center;transform:rotateX(0deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform 1.15s cubic-bezier(.22,.8,.2,1);cursor:pointer}
+.letter{position:absolute;z-index:8;left:7%;width:86%;height:265px;top:18px;background:var(--paper);border-radius:5px;border:1px solid rgba(32,63,118,.08);padding:24px 22px;text-align:center;box-shadow:0 7px 20px rgba(50,50,50,.12);transform:translateY(80px);opacity:0;transition:transform 1.35s cubic-bezier(.17,.8,.18,1),opacity .7s}
+.letter .mini{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#68727e}
+.letter h2{font-size:39px;font-weight:normal;font-style:italic;margin:12px 0 3px;line-height:1}
+.letter p{margin:7px 0;color:#635b59;font-size:14px}
+.env-front{z-index:6}
+.seal{position:absolute;z-index:12;left:calc(50% - 31px);top:43%;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:#b96f78;color:white;font-size:25px;box-shadow:0 5px 15px rgba(100,50,50,.2);transition:opacity .35s,transform .35s;cursor:pointer}
+.cover-copy{position:absolute;z-index:11;bottom:24px;width:100%;text-align:center;font-style:italic;color:#765d5b;font-size:14px;transition:opacity .3s}
+.envelope.open .flap{transform:rotateX(-180deg)}
+.envelope.open .letter{z-index:13;transform:translateY(-165px);opacity:1}
+.envelope.revealed{opacity:0;transform:translateY(18px) scale(.96);pointer-events:none;transition:opacity .55s ease,transform .55s ease}
+.envelope.open .seal{opacity:0;transform:scale(.3)}
+.envelope.open .cover-copy{opacity:0}
+
+/* Invitation revealed in the same scene */
+.invite{position:absolute;z-index:20;left:50%;top:50%;width:min(90vw,570px);transform:translate(-50%,58%) scale(.93);opacity:0;pointer-events:none;transition:transform 1.25s cubic-bezier(.16,.85,.2,1),opacity .9s}
+.invite.show{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+.card{position:relative;background:var(--paper);border:1px solid rgba(32,63,118,.13);border-radius:10px;padding:36px 28px 30px;box-shadow:0 25px 65px rgba(45,53,66,.2);overflow:hidden}
+.card:before{content:"";position:absolute;inset:13px;border:1px solid rgba(32,63,118,.18);pointer-events:none}
+.botanical{position:absolute;left:-15px;bottom:-18px;width:180px;height:170px;opacity:.75;transform:rotate(-7deg)}
+.botanical.right{left:auto;right:-15px;transform:scaleX(-1) rotate(-7deg)}
+.tiny{position:relative;letter-spacing:4px;text-transform:uppercase;font-size:11px;text-align:center;color:#536a62}
+h1{position:relative;text-align:center;font-size:clamp(43px,10vw,68px);line-height:.9;font-weight:normal;font-style:italic;margin:14px 0 6px;color:var(--ink)}
+.sub{position:relative;text-align:center;color:#53605e;font-size:15px;letter-spacing:1px}
+.illustration{position:relative;margin:18px auto 8px;width:min(100%,450px);height:180px}
+.illustration svg{width:100%;height:100%}
+.details{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:10px 0 17px}
+.detail{text-align:center;padding:11px 5px;background:rgba(235,225,209,.72);border-radius:8px;font-size:12px;color:#655f5a}
+.detail b{display:block;font-size:18px;color:var(--green);margin-bottom:3px}
+.note{position:relative;text-align:center;font-style:italic;font-size:16px;color:#6c5a58;line-height:1.5;max-width:430px;margin:10px auto 20px}
+.question{position:relative;text-align:center;font-size:20px;margin:4px 0 10px}
+.actions{position:relative;text-align:center}
+.actions button{border:0;border-radius:999px;padding:11px 22px;margin:4px;cursor:pointer;transition:.2s;box-shadow:0 4px 10px rgba(50,50,50,.08)}
+.yes{background:var(--green);color:white}.later{background:#ead9d2;color:#5e4b49}
+.actions button:hover{transform:translateY(-2px)}
+.response{position:relative;text-align:center;min-height:25px;margin-top:6px;color:#8a5e67;font-style:italic}
+.close{position:absolute;z-index:30;right:20px;top:17px;border:0;background:transparent;color:#6e7370;font-size:22px;cursor:pointer}
+.swipe{position:relative;text-align:center;font-size:11px;letter-spacing:1px;color:#777;margin-top:7px}
+
+@media(max-width:520px){.envelope-stage{height:315px}.envelope{height:245px}.letter{height:238px}.details{grid-template-columns:1fr 1fr}.detail:last-child{grid-column:1/-1}.card{padding:31px 18px 25px}.illustration{height:145px}.note{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="background"></div>
+<div class="hearts" aria-hidden="true">
+  <span class="heart" style="left:5%;animation-duration:13s;animation-delay:0s">♡</span>
+  <span class="heart" style="left:16%;animation-duration:16s;animation-delay:4s">♥</span>
+  <span class="heart photo" style="left:27%;animation-duration:19s;animation-delay:2s"></span>
+  <span class="heart" style="left:39%;animation-duration:14s;animation-delay:6s">♡</span>
+  <span class="heart photo" style="left:52%;animation-duration:17s;animation-delay:1s"></span>
+  <span class="heart" style="left:66%;animation-duration:15s;animation-delay:5s">♥</span>
+  <span class="heart photo" style="left:78%;animation-duration:20s;animation-delay:3s"></span>
+  <span class="heart" style="left:91%;animation-duration:12s;animation-delay:7s">♡</span>
+</div>
+
+<main class="scene">
+  <div class="intro">Nahir · hay algo que abrir <b>♡</b></div>
+
+  <div class="envelope-stage" id="stage">
+    <div class="envelope" id="envelope">
+      <div class="env-back"></div>
+      <div class="letter">
+        <div class="mini">para Nahir</div>
+        <h2>Una pequeña<br>aventura</h2>
+        <p>creo que ya es hora de escaparnos un ratito 🌿</p>
+      </div>
+      <div class="flap" id="flap"></div>
+      <div class="env-front"></div>
+      <div class="seal" id="seal">♥</div>
+      <div class="cover-copy">toca el corazón · o desliza la solapa</div>
+    </div>
+
+    <section class="invite" id="invite">
+      <article class="card">
+        <button class="close" id="closeBtn" aria-label="Cerrar invitación">×</button>
+        <div class="tiny">Nahir, estás oficialmente invitada</div>
+        <h1>Picnic<br>para dos</h1>
+        <div class="sub">una tarde sin prisa · buena comida · nosotros</div>
+
+        <div class="illustration" aria-hidden="true">
+          <svg viewBox="0 0 500 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#203f76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M25 145c85-26 367-26 450 0"/>
+              <path d="M32 145c70 23 368 23 436 0"/>
+              <path d="M87 133c18-24 42-25 62-1"/>
+              <path d="M101 130c2-22 7-37 17-55"/>
+              <path d="M118 73c-9 5-16 12-18 20M118 73c10 5 17 13 19 21"/>
+              <path d="M360 136l-17-70c-2-8 4-15 12-15h30c7 0 13 6 12 14l-8 71"/>
+              <path d="M345 70h49M350 81h39M353 94h33"/>
+              <path d="M369 48V31"/>
+              <path d="M369 31c8-4 14-3 19 1"/>
+              <path d="M235 143c0-29 19-49 42-49s42 20 42 49"/>
+              <path d="M226 143h103"/>
+              <path d="M246 113h62"/>
+              <path d="M248 113l-11 30M306 113l11 30"/>
+              <path d="M174 144l35-36 36 36"/>
+              <path d="M187 131h45"/>
+              <path d="M205 108l5-26"/>
+              <path d="M210 82c-11 6-17 14-18 24M210 82c11 6 17 14 18 24"/>
+              <path d="M404 145c4-22 11-39 24-50M428 95c-6 1-12 5-17 12M428 95c6 2 11 6 14 12"/>
+              <path d="M55 146c5-19 10-35 21-49M76 97c-7 1-13 5-18 12M76 97c6 2 10 6 13 12"/>
+            </g>
+            <g fill="#e7a0aa" stroke="#203f76" stroke-width="1.5">
+              <path d="M113 66c-6-8 5-16 11-7 6-9 17 0 11 8-4 5-8 8-11 11-3-3-7-6-11-12Z"/>
+              <path d="M412 65c-5-7 5-14 10-6 5-8 15 0 10 7-3 5-7 7-10 10-3-3-6-6-10-11Z"/>
+            </g>
+            <g stroke="#3f7457" stroke-width="2">
+              <path d="M60 149c-5-15-9-24-17-34M55 129c-8 1-13 4-17 10M59 136c7-2 12-5 15-10"/>
+              <path d="M438 146c5-15 9-24 17-34M443 126c8 1 13 4 17 10M440 135c-7-2-12-5-15-10"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="details">
+          <div class="detail"><b>♡</b>PARA<br><span>Nahir</span></div>
+          <div class="detail"><b>17:00</b>HORA<br><span>5:00 PM</span></div>
+          <div class="detail"><b>🌿</b>LUGAR<br><span>Parque Simón Bolívar</span></div>
+        </div>
+
+        <div class="note">“No hace falta una ocasión especial. Solo una manta, algo rico y ganas de pasarla bien contigo.”</div>
+        <div class="question">¿Te vienes conmigo? 👀</div>
+        <div class="actions">
+          <button class="yes" onclick="answer('Perfecto. La canasta queda oficialmente reservada para nosotros. 🧺♡')">Sí, voy 💕</button>
+          <button class="later" onclick="answer('Te dejo pensarlo… pero aviso: ya escogí la manta. 😂')">Déjame pensarlo</button>
+        </div>
+        <div class="response" id="response"></div>
+        <div class="swipe">puedes cerrar la invitación con × y volver a abrirla</div>
+
+        <svg class="botanical" viewBox="0 0 180 170" fill="none" aria-hidden="true">
+          <g stroke="#3f7457" stroke-width="2" stroke-linecap="round">
+            <path d="M28 165c12-48 32-81 64-112M49 132c-10-3-19-9-25-18M61 116c13-3 22-9 30-18M76 94c-11-4-18-10-24-19M92 73c10-2 17-7 23-15"/>
+          </g><g fill="#e7a0aa"><circle cx="27" cy="114" r="7"/><circle cx="112" cy="58" r="7"/><circle cx="61" cy="97" r="6"/></g>
+        </svg>
+        <svg class="botanical right" viewBox="0 0 180 170" fill="none" aria-hidden="true">
+          <g stroke="#3f7457" stroke-width="2" stroke-linecap="round">
+            <path d="M28 165c12-48 32-81 64-112M49 132c-10-3-19-9-25-18M61 116c13-3 22-9 30-18M76 94c-11-4-18-10-24-19M92 73c10-2 17-7 23-15"/>
+          </g><g fill="#e7a0aa"><circle cx="27" cy="114" r="7"/><circle cx="112" cy="58" r="7"/><circle cx="61" cy="97" r="6"/></g>
+        </svg>
+      </article>
+    </section>
+  </div>
+</main>
+
+<script>
+const envelope=document.getElementById('envelope');
+const flap=document.getElementById('flap');
+const seal=document.getElementById('seal');
+const invite=document.getElementById('invite');
+const closeBtn=document.getElementById('closeBtn');
+let opened=false, startY=0, dragging=false;
+function openEnvelope(){
+  if(opened)return;
+  opened=true;
+  envelope.classList.add('open');
+  setTimeout(()=>{ invite.classList.add('show'); setTimeout(()=>envelope.classList.add('revealed'),350); },1350);
+}
+function closeEnvelope(){
+  invite.classList.remove('show');
+  envelope.classList.remove('revealed');
+  setTimeout(()=>{envelope.classList.remove('open');opened=false},650);
+}
+seal.addEventListener('click',openEnvelope);
+flap.addEventListener('click',openEnvelope);
+closeBtn.addEventListener('click',closeEnvelope);
+flap.addEventListener('pointerdown',e=>{dragging=true;startY=e.clientY;flap.setPointerCapture(e.pointerId)});
+flap.addEventListener('pointerup',e=>{if(!dragging)return;dragging=false;const dy=e.clientY-startY;if(dy>45 && opened) closeEnvelope(); else if(dy<-35) openEnvelope();});
+function answer(msg){document.getElementById('response').textContent=msg}
+</script>
+</body>
+</html>
